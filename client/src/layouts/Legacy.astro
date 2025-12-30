@@ -1,0 +1,44 @@
+---
+import Header from "../components/header"
+import Footer from "../components/footer"
+
+interface Props {
+	title: string,
+	icon: string | ImageMetadata,
+	version: string,
+	manifest: string,
+}
+
+const { title, icon, version, manifest } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="icon" type="image/png" href={typeof icon === "string" ? icon : icon.src} />
+		{!!manifest && <link rel="manifest" href={manifest} />}
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{title}</title>
+
+	</head>
+	<body>
+		<div id="wrapper">
+			<div id="header">
+				<Header text="DSB Mobile 2.0" homepage='..' logo={icon} width="64" height="64" pixel={true} version={version} client:only>
+					<h3 id='dsb-subtitle'>VERTRETUNGSPLAN</h3>
+				</Header>
+			</div>
+			<div id="main-content">
+				<div class='center'>
+					<div class='main'>
+						<slot />
+					</div>
+				</div>
+            </div>
+			<div id="footer">
+				<Footer />
+			</div>
+		</div>
+	</body>
+</html>
