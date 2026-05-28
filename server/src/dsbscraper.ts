@@ -2,27 +2,27 @@ import { Express, Request, Response, NextFunction } from 'express';
 import { parse } from 'node-html-parser';
 import DSB from 'dsbapi';
 
-//#region dsb scraper
+
 interface Substitution {
-classes: string;
-hours: string;
-subject: string;
-usual_subject: string;
-room: string;
-replacement: string;
+    classes: string;
+    hours: string;
+    subject: string;
+    usual_subject: string;
+    room: string;
+    replacement: string;
 }
 
 interface DayTimetable {
-date: string;
-day: string;
-messages: Array<string>;
-substitutions: Array<Substitution>;
+    date: string;
+    day: string;
+    messages: Array<string>;
+    substitutions: Array<Substitution>;
 }
 
 interface Timetables {
-last_modified: string;
-day_one: DayTimetable;
-day_two: DayTimetable;
+    last_modified: string;
+    day_one: DayTimetable;
+    day_two: DayTimetable;
 }
 
 
@@ -188,4 +188,3 @@ export function initDSBScraperAPI(app: Express) {
 
     console.log("DSBScraper API init done.");
 }
-//#endregion

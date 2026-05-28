@@ -1,5 +1,5 @@
 import { Express, Request, Response } from "express";
-import { Exam, ExamDay, available_lists } from "./exams";
+import { Exam, ExamDay, AuthFunction, available_lists } from "./exams";
 
 interface EventData {
     summary: string; // name
@@ -123,7 +123,7 @@ DTEND;TZID=Europe/Berlin:${data.end}
 DTSTAMP:${dateToEventString(new Date())}Z
 END:VEVENT
 END:VCALENDAR`;
-}
+} // I will just pretend that this method doesn't doxx me
 
 function genUID(data: EventData): string {
     return new Date().getTime().toString() + data.start; // works ok ig
@@ -153,8 +153,8 @@ function addZeroIfSmall(n: number): string{
     return n < 10 ? `0${n}` : n.toString();
 }
 
-export function initICalAPI(app: Express) {
-    app.get('/ical/:list/:id', (req: Request, res: Response) => { // so /api/v1/ical/Q1_1/IF-LK1.ics (SHOULD be unique per quarter)
+export function initICalAPI(app: Express, authenthicateDSB: AuthFunction) {
+    app.get('/ical/:list/:id', authenthicateDSB, (req: Request, res: Response) => { // so /api/v1/ical/Q1_1/IF-LK1.ics (SHOULD be unique per quarter)
         const list = req.params.list;
         const id = req.params.id;
         

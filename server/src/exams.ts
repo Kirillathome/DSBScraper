@@ -3,7 +3,7 @@ import PDFParser from "pdf2json";
 
 export type AuthFunction = (req: Request, res: Response, next: NextFunction) => void; // idk what expressjs wants from me
 
-//#region exam scraper
+
 export interface ExamDay {
 	date: string,
 	day: string,
@@ -27,11 +27,25 @@ interface ExamData {
     exams: Array<ExamDay>,
 }
 
-export const available_lists = [ // register here, you can just uncomment these parts and replace the names/paths if you need to
-	// {name: "Q1_1", path: "./pdf/Q1_1.pdf", available: true, exams: []} as ExamData,
-    // {name: "Q1_2", path: "./pdf/Q1_2.pdf", available: true, exams: []} as ExamData,
-    // {name: "Q1_3", path: "./pdf/Q1_3.pdf", available: false, exams: []} as ExamData,
-    // {name: "Q1_4", path: "./pdf/Q1_4.pdf", available: false, exams: []} as ExamData,
+interface Page {
+    Texts: Text[];
+}
+
+interface Text {
+    x: number;
+    y: number;
+    R: TextRun[];
+}
+
+interface TextRun {
+    T: string,
+}
+
+export const available_lists: ExamData[] = [ // register here, you can just uncomment these parts and replace the names/paths if you need to
+	// {name: "Q1_1", path: "./pdf/Q1_1.pdf", available: true, exams: []},
+    // {name: "Q1_2", path: "./pdf/Q1_2.pdf", available: true, exams: []},
+    // {name: "Q1_3", path: "./pdf/Q1_3.pdf", available: false, exams: []},
+    // {name: "Q1_4", path: "./pdf/Q1_4.pdf", available: false, exams: []},
 ]
 
 for (const l of available_lists) {
@@ -57,7 +71,7 @@ function availableToJSON() {
     return arr;
 }
 
-function parseJSON(p: any, e: Array<ExamDay>) {
+function parseJSON(p: Page, e: Array<ExamDay>) {
 	let ignoring = false; // "In folgenden Kursen fehlen deswegen Schüler:"
 	let date = ""; // 2x ".", 10 chars
 	let day = ""; // Montag Dienstag Mittwoch Donnerstag Freitag
@@ -83,7 +97,7 @@ function parseJSON(p: any, e: Array<ExamDay>) {
 		text.R.forEach((r) => {
 			t += r.T;
 		})
-		t = t.replaceAll("%20", " ");
+		t = t.replaceAll("%20", " "); // if you know a better way lmk
 		t = t.replaceAll("%3A", ":");
 		t = t.replaceAll("%2F", "/");
 		t = t.replaceAll("%C3%BC", "ü");
@@ -210,4 +224,3 @@ export function initExamAPI(app: Express, authenthicateDSB: AuthFunction) {
 
     console.log("Exam API init done.");
 }
-//#endregion

@@ -25,7 +25,7 @@ Hier sind Tutorials zum lernen der Basics von [Astro](https://docs.astro.build/e
 Die folgenden Befehle bitte in dem *server* Ordner ausführen (`cd server/`).
 1. `npm install` zum installieren der benötigten Pakete (nur das erste Mal notwendig)
 2. in `src/dsbscraper.ts`, die Konstanten `user` und `key` **(Zeile 29 & 30)** auf ihren richtigen Wert setzen **(WICHTIG!)**
-3. Die Klausurlisten in den `pdf/` Ordner tun und in `src/exams.ts` registrieren (in der Konstante `available_lists` in **Zeile 30**, eine Template ist in den Kommentaren zu finden)
+3. Die Klausurlisten und Stundenpläne in den `pdf/` Ordner tun und in `src/exams.ts` bzw. `src/timetables.ts` registrieren (in der Konstante `available_lists` in **Zeile 44** bzw. `available_tables` in **Zeile 79**; eine Template ist in den Kommentaren zu finden)
 
 Und jedes mal wenn man etwas verändert hat und den Server (neu-)starten will:
 1. `npx tsc` zum kompilieren
