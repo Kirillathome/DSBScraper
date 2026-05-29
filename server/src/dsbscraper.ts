@@ -28,9 +28,14 @@ interface Timetables {
 
 const user = 'REPLACEME';
 const key = 'REPLACEME';
+
+// alternative way is to supply the user and key via the command line arguments
+// const user = process.env.SERVER_USER;
+// const key = process.env.SERVER_KEY;
 const dsb = new DSB(user, key); // dsb thing getter
 
 let last_modified: string = "";
+let cache: Timetables = {} as Timetables;
 
 export const authenthicateDSB = (req: Request, res: Response, next: NextFunction) => {
     const h_user = req.headers.user;
@@ -44,23 +49,30 @@ export const authenthicateDSB = (req: Request, res: Response, next: NextFunction
     }
 };
 
-async function getLinks(): Promise<string[]> { // fill the list of links
+async function getLinks(): Promise<[string[], boolean]> { // fill the list of links
     const links: Array<string> = [];
     const data = await dsb.fetch();
     const timetables = DSB.findMethodInData('timetable', data); // get data
-    last_modified = timetables['data'][0]['date'];
+    const lm = timetables['data'][0]['date'];
+
+    if (lm === last_modified && cache.day_one !== undefined) {
+        return [[], true];
+    }
+    
+    last_modified = lm
+
     for (const timetable_data of timetables['data']) {
         if (timetable_data['title'] === "VSOnline") {
-        for (const timetable_item of timetable_data['objects']) {
-            links.push(timetable_item['url']);
-        }
+            for (const timetable_item of timetable_data['objects']) {
+                links.push(timetable_item['url']);
+            }
         }
     }
-    return links;
+  
+    return [links, false];
 }
 
 async function parseHTML(links: Array<string>): Promise<Timetables> {
-
     const timetables = {} as Timetables;
     const day_one = {} as DayTimetable;
     const day_two = {} as DayTimetable;
@@ -163,17 +175,22 @@ async function parseHTML(links: Array<string>): Promise<Timetables> {
 
     }
 
+    cache = timetables;
     return timetables;
 }
 
 export function initDSBScraperAPI(app: Express) {
     app.get('/dsb', authenthicateDSB, async (_req: Request, res: Response) => {
         try {
-            const links = await getLinks();
-            const timetables = await parseHTML(links);
-            res.json(timetables);
+            const [links, cached] = await getLinks();
+            if (cached) {
+                res.json(cache);
+            } else {
+                const timetables = await parseHTML(links);
+                res.json(timetables);
+            }
         } catch(e) {
-            res.status(412).json({});
+            res.status(412).json(cache);
         }
     });
     app.get('/dsbdummy', authenthicateDSB, (_req: Request, res: Response) => {
